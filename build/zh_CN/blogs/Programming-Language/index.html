@@ -1,0 +1,517 @@
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        <title>Ziqi's blog</title>
+        <link rel="stylesheet" href="/style.css">
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <h1 class="title">Ziqi Shao</h1>
+                <ul class="nav nav-list">
+                    <li class="nav-list-item"><a href="/zh_CN/about">关于我</a></li>
+                    <li class="nav-list-item"><a href="/zh_CN/blogs">博客</a></li>
+                    <li class="nav-list-item"><a href="/en_US/blogs">English</a></li>
+                </ul>
+            </header>
+        <main>
+            <div class="post">
+                <article class="post-block">
+                    <h1 class="post-title">编程语言课程笔记</h1>
+                    <div class="post-info">
+                        <p>2017年5月1日</p>
+                    </div>
+                    <div class="post-content">
+                        <h2>Introduction 背景简介</h2>
+<p>这份笔记是笔者学习华盛顿大学开设的《编程语言》时记录整理，这门课程主要通过介绍三门语言来讲授编程语言的方方面面，以及不同的语言特性对编写程序的影响。对于熟悉常见编程语言比如 Java/C/C++/Python/JavaScript 的开发者来说，这门课能够开阔眼界，从而了解语言的表达力和局限性。</p>
+<p>目前该课程仍然在 Coursera 上有开设：<a href="https://www.coursera.org/learn/programming-languages">https://www.coursera.org/learn/programming-languages</a></p>
+<p>笔记中不会过多介绍基本语法，只谈一些重要的特性。如有需要也可参考笔者学习时的课堂讲义和完成的作业：<a href="https://github.com/novakoki/Programming-Language">https://github.com/novakoki/Programming-Language</a></p>
+<h3>Categories 编程语言分类</h3>
+<p>教授将语言按照主要的特性分成四类，其他的特性会穿插介绍</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>函数式 (Functional)</th>
+<th>面向对象 (Object-Oriented)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>静态 (Static)</td>
+<td>ML</td>
+<td>Java</td>
+</tr>
+<tr>
+<td>动态 (Dynamic)</td>
+<td>Racket</td>
+<td>Ruby</td>
+</tr>
+</tbody>
+</table>
+<h3>Essential Parts 编程语言组成部分</h3>
+<ul>
+<li>语法 (Syntax)</li>
+<li>语义 (Semantic)</li>
+<li>习惯（Idioms）: 常用的一些利用语言特性的套路，比如 C++ 的 RAII</li>
+<li>库（Libraries）: 现成可以用的库，以及如操作文件这种没法自己实现的功能</li>
+<li>工具（Tools）: 编译器（Compiler）, 命令行（REPL）, 调试器（Debugger）, etc.</li>
+</ul>
+<p>这里重点看一下语法和语义的差别。经常看到有人会说某个语言的新特性只是语法糖而已，没有什么实质性作用。</p>
+<h2>ML 部分</h2>
+<h3>Static Type 静态类型</h3>
+<p>ML 是一门静态语言，静态是指它在运行前进行类型检查</p>
+<pre><code class="language-sml">val x = e (* 称之为一次数据绑定， e 为一个表达式 *)
+然而我们要看到的不仅仅是这样一句语法描述，还要了解背后的语义，即类型检查和求值。
+
+val x = 1 (* x 的类型为 int，值为 1 *)
+(* 每做一次数据绑定，当前环境都会更新，这个环境即作用域，后面会详细讨论 *)
+val y = x + 2 (* y 的类型为 int, 值为 3 *)
+val z = y + &quot;3&quot; (* 类型检查失败， + 不能用于 string 与 int 之间 *)
+val z = w (* 类型检查失败，当前环境中找不到 w *)
+</code></pre>
+<p>关于静态与动态，之后将与 Racket 对比来看，这里只提一些 ML 的特性。</p>
+<h4>Type Inference 类型推导</h4>
+<p>ML 是一门静态语言，但却是一门大多数时候不显式指定类型的语言，这得益于它强大的类型推导能力。</p>
+<pre><code class="language-sml">val x = 1 + 1 (* x 的类型为 int，是因为 + 运算符的返回类型为 int *)
+fun return_self xs = xs (* 不能精确地确定这个函数的类型，所以类型为 'a -&gt; 'a，'a 为任意类型 *)
+(* 再如 length 函数返回一个列表的长度，它的类型就为 'a list -&gt; int *)
+
+一个类型推导的过程例子如下
+
+```sml
+fun f (x, y, z) =
+  if true
+  then (x, y, z)
+  else (y, x, z)
+(*
+1. 令 x 的类型为 T1， y 为 T2， z 为 T3，返回类型为 T4
+2. if 语句的两个分支得到的类型必须一致，即 T4=T1*T2*T3=T2*T1*T3，得到约束 T1=T2
+3. 最终函数类型为 'a*'a*'b -&gt; 'a*'a*'b，即 x 和 y 的类型必须一致，而 z 可以是任意类型
+*)
+</code></pre>
+<h4>Option</h4>
+<p>Option 提供了一种处理边界情况的能力,
+即运算得到的可能是某种你需要的结果 (SOME)，也可能没有结果 (NONE)。</p>
+<p>比如写一个找出一个 int list 中最大值的函数</p>
+<pre><code class="language-sml">(* Without Option *)
+fun find_greatest (xs: int list) =
+  if null xs (* 考虑空列表这种边界情况 *)
+  then 0 (* 这里如果返回 0 就是一种很不好的风格 *)
+  else greatest_number
+</code></pre>
+<p>在一门静态语言中，函数返回值的类型是确定的，在没有 Option 的情况下只能返回一个特定的数</p>
+<pre><code class="language-sml">(* With Option *)
+fun find_greatest (xs: int list) =
+  if null xs then NONE (* 没有结果，即找不到最大值 *)
+  else SOME (greatest_number) (* 有最大值，则包装成 Option 返回 *)
+</code></pre>
+<h3>Immutable 不可变</h3>
+<p>函数式语言最重要的特性之一就是数据默认是不可变的</p>
+<pre><code class="language-sml">val x = 1 (* 一旦绑定了就无法再改变这个 x 的值 *)
+x = 2 (* ML 中没有赋值的概念，这个表达式比较是否相等 *)
+val x = 2 (* 新的数据绑定，之前的 x 还在但是会被新的 x 遮蔽(shadow) *)
+</code></pre>
+<p>优点：</p>
+<ul>
+<li>一个比较明显的好处是排除了引用（别名）的危害。
+  如果数据不会被修改，那一个“变量”是否是引用就并不重要。
+  甚至于数据结构的存储是可以共享的，以此节省空间的开销。</li>
+</ul>
+<pre><code class="language-sml">val x = [1, 2, 3]
+val y = [4, 5, 6]
+val z = x::y (* z 为 x 和 y 两个列表拼接而成 *)
+(* 如果 x 和 y 是引用， 那么更改 x 或 y 都会使得 z 的值发生变化
+但是如果数据是不可变的就没有这个问题，甚至在内存分配上 z 其实只要共享 x 和 y 的空间就可以了 *)
+</code></pre>
+<ul>
+<li>利于并行和并发。这个好处使得函数式语言（或者理念）焕发新生。</li>
+</ul>
+<p>在数据不可变的基础上建立数据结构，所关注的不再是常见的增删改查，而是构造和解构，即如何构造新的数据结构和从数据结构中取得数据。</p>
+<h3>Build New Types 自定义类型</h3>
+<p>一门语言中一般会提供一些基本类型，如 <code>int, bool, float</code>, etc.</p>
+<p>同时也会提供构造自定义类型的能力</p>
+<p>自定义类型可以分为下面三种</p>
+<ul>
+<li>Each Of : 即数据类型同时包含多个类型的值，比如元组 <code>(1, “string”)</code> 类型是 <code>(int * string)</code>
+  ML 中使用 <code>Records</code> 来表示这样的类型</li>
+</ul>
+<pre><code class="language-sml">val my_records = {bar: true, foo: 1, baz: (1, 2)}
+(1, 2, 3) = {1: 1, 2: 2, 3: 3} (* 元组是一种特殊的 Records *)
+</code></pre>
+<ul>
+<li>One Of : 数据类型包含多个类型中的一个，比如 <code>int option</code>，可能包含一个 <code>int</code> 值，也可能没有
+  ML 中使用 <code>Datatype</code> 来表示这样的类型</li>
+</ul>
+<pre><code class="language-sml">datatype mytype = TwoInts of int * int
+                | Str of string (* | 是或的意思 *)
+                | Pizza
+(* TwoInts, Str, Pizza 相当于给某种类型加上了标签，同时它们也是函数可以用来构造与解构 *)
+
+val mydata = TwoInts(1, 2) (* mydata 的类型为 mytype *)
+
+datatype my_int_option = SOME of int (* Option 是一种特殊的 Datatype *)
+                      | NONE
+</code></pre>
+<ul>
+<li>Self Reference : 自指的类型，用于描述递归的数据类型，
+  比如 <code>int list</code> 可能是空的，也可能是一个 <code>int</code> 值和另一个 <code>int list</code> 的组合（递归地定义）
+  （事实上 <code>int list</code> 融合了以上三种）</li>
+</ul>
+<pre><code class="language-sml">datatype my_int_list = Empty
+                    | Cons of int * my_int_list
+
+[1,2,3,4,5] = [1, [2, [3, [4, [5, []]]]]] (* 类似俄罗斯套娃 *)
+</code></pre>
+<h3>Pattern Match 模式匹配</h3>
+<p>模式匹配提供了强大优雅的从各种自定义数据类型中取数据的能力，即解构的能力</p>
+<h4>case 表达式</h4>
+<pre><code class="language-sml">fun getOrElse op =
+  case op of
+      NONE =&gt; 0
+    | SOME x =&gt; x (* 从 Option 中解构出包装的值 *)
+
+fun find_greatest xs =
+  case xs of
+    head::tail =&gt; (* 从列表解构出表头 *)
+    head::(body::tail) =&gt; (* Nested Pattern，匹配至少有一个元素的列表 *)
+
+(* 从上一节的 Datatype 中解构 *)
+  case mydata of
+    TwoInts(a, b) =&gt; a + b (* 解构出 a = 1, b = 2 *)
+  | _ =&gt; 0
+(* TwoInts 既是构造器也是提取器 *)
+</code></pre>
+<h4>函数参数解构</h4>
+<pre><code class="language-sml">fun is_greater (x, y) = (* 这里已经发生了模式匹配， ML 所有的函数都是单参数的， 这里实际的参数是 (x, y) 这个元组 *)
+  x &gt; y (* 在函数体内取得的是已经从元组中解构出的值 *)
+(* ML 中另一种实现多参函数的方法是柯里化 (Currying) *)
+let, val 解构
+
+fun sum_triple (triple: int * int * int) =
+  let val (x,y,z) = triple (* 解构出元组中的值 *)
+  in x + y + z
+  end
+</code></pre>
+<h3>Tail Recursion 尾递归</h3>
+<p>大多数函数式语言中都没有过程式语言中常用的循环语句，而是通过递归的方式来实现。</p>
+<blockquote>
+<p>这是一种 <code>idiom</code>，是由不可变数据带来的，因为没法实现用来计数的迭代器</p>
+</blockquote>
+<pre><code class="language-sml">fun sum1 xs =
+  case xs of
+    [] =&gt; 0
+  | head::tail =&gt; head + sum1 tail (* bad style cause stack overflow *)
+
+(* 需要维护一个 O(n) 的调用栈
+  sum1 [1,2,3]
+  1 + sum1 [2,3]
+  1 + 2 + sum1 [3]
+  1 + 2 + 3 + sum1 []
+  1 + 2 + 3 + 0
+  1 + 2 + 3
+  1 + 5
+  6
+*)
+
+fun sum2 xs =
+  let fun helper (xs, acc) =
+    case xs of
+      [] =&gt; acc
+    | head::tail =&gt; helper(tail, acc + head) (* tail recursion*)
+  in helper(xs, 0)
+  end
+
+(* 尾递归优化下，不需要维护整个调用栈，空间复杂度 O(1)
+  helper([1,2,3], 0)
+  helper([2,3], 1)
+  helper([3], 3)
+  helper([], 6)
+  6
+*)
+</code></pre>
+<h3>Functions As Value 函数作为值传递</h3>
+<p>函数式语言另一个最重要的特性就是函数可以作为值来传递，即函数是一级公民。（First-Class Function)</p>
+<h4>Take Function As Argument 函数作为参数</h4>
+<p>以函数为参数的函数称为高阶函数，利用高阶函数可以更好地抽象与重用代码。（idiom）</p>
+<p>典型的高阶函数就是 <code>map</code> 。</p>
+<pre><code class="language-sml">fun map (f, xs) =
+  case xs of
+      [] =&gt; []
+    | x::xs' =&gt; (f x)::map(f, xs')
+
+map(fn x =&gt; x * 2, [1,2,3]) (* 得到 [2,4,6] *)
+</code></pre>
+<h4>Lexical Scope And Closure 词法作用域和闭包</h4>
+<blockquote>
+<p>function (closure) = code (for function body) + environment (lexical scope)</p>
+</blockquote>
+<p>即函数能访问到的变量不仅仅有参数和函数体内定义的变量，还有它的词法作用域中的变量。</p>
+<p>例子：回调、柯里化、函数组合等等</p>
+<p>（闭包这部分资料太多太多，不作具体展开了）</p>
+<h3>Equivalence and Side-Effect-Free 等价实现和无副作用</h3>
+<p>接口定义和实现分离是重要的编程实践。ML 使用模块来管理命名空间，分离接口与实现，以及隐藏私有方法。</p>
+<pre><code class="language-sml">(* 接口定义 *)
+signature RATIONAL_A =
+sig
+type rational
+val make_frac : int * int -&gt; rational
+val add : rational * rational -&gt; rational
+val toString : rational -&gt; string
+end
+
+(* 实现 *)
+structure Rational_1 :&gt; RATIONAL_A =
+struct
+datatype rational = ...
+fun make_frac (x, y) = ...
+fun add (r1, r2) = ...
+fun reduce r = ... (* 模块私有方法 *)
+fun toString r = ...
+end
+
+(* 调用 *)
+Rational_1.make_frac(1, 2) (* Rational_1 即一个命名空间 *)
+</code></pre>
+<p>同一个接口可以有不同的实现，同样的一个函数也可以有各种不同的实现，但是它们对调用者表现出的行为一致，这里隐含着等价的概念。</p>
+<p>当考虑等价实现的时候，可能有以下情况：</p>
+<ul>
+<li>维护：在不改变其他代码行为的前提下简化、重新组织代码</li>
+<li>向后兼容：在不改变已有功能的前提下增加新的特性</li>
+<li>性能优化：给出时间或空间上更佳的实现</li>
+<li>抽象：使用这个接口或者函数的客户端会感觉到内部实现的变化吗？</li>
+</ul>
+<p>不同的等价定义：</p>
+<ul>
+<li>语言层面的等价：同样的输入，得到同样的输出（包括产生同样的副作用、抛出同样的异常、同样终止或不终止）</li>
+<li>渐进等价：即算法复杂度相同，只考虑输入足够大的情况下，不考虑常数级别</li>
+<li>系统级别的等价：常数级别的性能也要考虑</li>
+</ul>
+<p>要保证两个实现的副作用相同，最简单的方式就是消除副作用。没有副作用的函数称为纯函数，副作用包括改变数据(引用)、输入输出等。</p>
+<blockquote>
+<p>ML中是可以做改变引用的值这种事的，所以它不是一门纯函数式语言。一门典型的纯函数式语言就是Haskell</p>
+</blockquote>
+<h2>Racket 部分</h2>
+<p>Racket 是一门由 Scheme 而来的动态类型、函数式的语言</p>
+<blockquote>
+<p>P.S. 其实比起 Scheme，它有类和对象</p>
+</blockquote>
+<h3>Syntax 语法</h3>
+<p>Racket 在语法方面比较特别，有两个特点：括号和前缀表达，例子见后文。</p>
+<p>Racket 里的所有东西都可以分为两种情况：</p>
+<ul>
+<li>原子类型 (atom)：</li>
+<li>字面量： <code>#t, 11, “hi”, null</code>, etc.</li>
+<li>变量名：<code>x</code></li>
+<li>关键字： <code>define, lambda, if</code>, etc.</li>
+<li>一个在括号中的序列</li>
+<li>每个序列中的第一个元素会对后面的元素产生作用</li>
+<li>如果第一个元素不是关键字且整个序列是表达式的一部分，那就把它作为函数来调用 （包括 <code>+, -, *, /</code> 也都是函数）</li>
+<li>整个序列表示了对应的抽象语法树且没有二义性</li>
+</ul>
+<h3>Delayed Evaluation And Thunk 延迟计算</h3>
+<p>语言设计上的一个关键语义：子表达式什么时候被求值</p>
+<p>对于 Racket, ML 以及大部分语言来说，当调用函数时，传入的参数表达式在执行函数体前被求值。但如果这个参数是一个函数，那在被调用之前，函数体的代码是不会被执行的。</p>
+<pre><code class="language-racket">(define (my-if-bad x y z) (if x y z))
+; 无论 x 真假，y 和 z 都会被求值
+(define (my-if x y z) (if x (y) (z)))
+; 当 y 和 z 是函数时，只会求值其中一个
+</code></pre>
+<p>这种用来延迟计算的函数称为 <code>thunk</code></p>
+<h4>Lazy Evaluation And Memoization</h4>
+<p>假设有一个很耗时的计算，但是并不知道最终会不会用到这个结果。这时我们可以用<code>thunk</code>来延迟这个计算。</p>
+<blockquote>
+<p>一些语言有内建的<code>call-by-name</code>机制，比如 Scala</p>
+</blockquote>
+<p>假设用到了这个结果，也并不知道是不是会多次使用。即使用了<code>thunk</code>来延迟这个计算，每一次需要用到结果还是需要做一次相同的计算。（这里的前提是无副作用）为了解决这个问题，我们需要记录这个计算是否执行过，以及它执行得到的结果。（和 ML 一样， Racket 也是允许<code>mutation</code>的）</p>
+<blockquote>
+<p>在一些语言中，比如 Haskell，有内建的这种机制，即参数要么不被求值，要么只被求值一次，称为<code>call by need</code>。一般常见的语言都是<code>call by value</code>。</p>
+</blockquote>
+<h4>Stream 流</h4>
+<p>如何产生一个无穷的序列，无论在空间上还是时间上都无法做到显式产生，但是我们可以用递推的方式描述它，以及编写方法来取得我们需要的部分。这样的方法称为流，典型的流就是 linux 的管道。</p>
+<pre><code class="language-racket">(define ones (lambda () (cons 1 ones))) ; 产生无限个 1
+; 每次得到一个值和产生它后继的 thunk
+</code></pre>
+<h3>Macros 宏</h3>
+<p>宏允许语言的使用者自定义语法，即可以扩展语言。宏展开在程序最开始执行，即在类型检查、编译、运行之前。</p>
+<p>Racket VS C/C++：</p>
+<ul>
+<li>Tokenization： 不是简单的替换，而是会区分单词。比如定义 head 为 car 的宏，headt 不会被替换成 cart</li>
+<li>Parenthesization： C/C++ 里需要用很多括号来确保宏替换后的正确执行，Racket 没有这个问题，因为括号在 Racket 里意味着一个语法序列的边界。</li>
+<li>Scope： Racket 不会在变量定义处进行宏替换</li>
+<li>Hygiene：</li>
+<li>在宏里面定义局部变量不会影响外部的同名变量</li>
+</ul>
+<pre><code class="language-racket">(define-syntax double4
+(syntax-rules ()
+    [(double4 e)
+    (let* ([zero 0]
+            [x e])
+    (+ x x zero))]))
+
+(let ([zero 17])
+(double4 zero)) ; 结果为 34
+</code></pre>
+<ul>
+<li>在宏里面定义的局部变量永远指向宏定义处的环境，而非宏调用时的环境</li>
+</ul>
+<pre><code class="language-racket">(define-syntax double
+(syntax-rules ()
+    [(double e)
+    (let ([x e])
+    (+ x x))]))
+
+(let ([+ *])
+(double 17)) ; 结果为 34
+</code></pre>
+<h3>Eval 执行代码</h3>
+<p>很多语言都提供了执行自身代码的函数，比如 JavaScript, Python 都有。但 Racket 的区别在于，它以列表的形式表示要执行的代码而非字符串。</p>
+<pre><code class="language-racket">(define my-code
+  (list '+ 5 3)) ; '+ 是一个 Symbol
+
+(eval my-code) ; 8
+</code></pre>
+<h2>Ruby Part</h2>
+<p>Ruby 有如下重要特性</p>
+<ul>
+<li>纯面向对象(pure OOP)：Ruby 中的所有值都是对象，每个表达式执行后都得到一个对象（有些面向对象语言不是这样，比如 Java 中的整型、布尔型、浮点数字面量都不是对象）</li>
+<li>基于类的面向对象(class-based)：每个对象都是类的实例。类决定了对象所拥有的方法。（有些语言也不是基于类的，典型的如 JavaScript 是基于原型的）</li>
+<li>混入(mixin)：多重继承（C++）与接口（Java）之间的一个折中。Ruby 中每个类都只有一个父类，但是可以有任意数量的混入，不像接口，它们可以定义方法（而不只是要求某个方法要存在）。</li>
+<li>动态：Ruby 允许在任意对象上以任意参数调用任意方法，还可以在运行时改变类和对象的属性</li>
+<li>反射(reflection)：可以在运行时知道对象的类是什么，有哪些方法</li>
+<li>闭包（block and closure）：block 几乎就是闭包并且可以方便地用来使用库中的高阶函数，由于众多迭代函数的存在，Ruby 中也几乎不会显示使用循环。Ruby 中也有完整的闭包（proc）</li>
+<li>脚本语言（script language）：脚本语言没有一个精确的定义，它意味着能够快速地写出简短的程序，方便地操作文件和字符串，较少考虑性能</li>
+<li>流行于 Web 应用开发：Ruby on Rails 是一个非常流行的服务端框架</li>
+</ul>
+<h3>Class-Based OOP 基于类的面向对象</h3>
+<p>面向对象有如下几条规则：</p>
+<ol>
+<li>所有变量都是对象的引用</li>
+<li>给定一个对象，可以通过调用它的方法与之交流，也可以被称为发送消息</li>
+<li>每个对象都有其私有的状态，只有对象自身的方法才能访问和修改状态</li>
+<li>每个对象都是类的实例</li>
+<li>类决定了对象的行为，类包含了方法的定义，它决定了对象如何处理它收到的调用（消息）</li>
+</ol>
+<p>在另一些面向对象语言比如 Java/C# 中，大部分的规则都被实现了，然而 Ruby 给出了一个更完整的实现。
+例如：</p>
+<ol>
+<li>一些字面量在 Java/C# 中不是对象，违反了规则1</li>
+<li>Java/C# 中有 <code>public</code> 的属性，违反了规则3</li>
+</ol>
+<h4>Calling Methods 调用方法</h4>
+<pre><code class="language-ruby">e0.m(e1, e2, ...)
+</code></pre>
+<p>与其他语言类似，首先得到表达式 <code>e0, e1, e2…</code> 的结果 <code>obj0, obj1, obj2, …</code> ，然后以 <code>obj1, obj2, …</code> 调用 <code>obj0</code> 的方法 <code>m</code>。方法调用另一种普遍的说法是消息传递，即向 <code>obj0</code> 传递了消息 <code>m</code>，附带 <code>obj1, obj2, …</code> 为参数，这种说法“更面向对象”，因为我们不关心接受者 <code>obj0</code> 是怎样实现的，只关心它能够接受并处理消息</p>
+<h4>Instance Variables 实例变量与类变量</h4>
+<p>一个对象有对应的定义了方法的类，也有它自己的实例变量，可以持有值。这在 Java/C#/C++ 中称为域（fields）（或者属性？），不同的是，在 Ruby 中没有专门的声明一个对象所拥有的实例变量，当需要添加一个实例变量的时候，只要相应地赋值就可以。对应的，Java/C#/C++ 中有静态方法与静态变量，Ruby 中也有类变量与类方法，即被所有该类的实例共享。</p>
+<pre><code class="language-ruby"># instance varible
+@foo # getter
+@foo= newValue # setter, will be created if not exist
+# class varible
+@@foo
+</code></pre>
+<h3>Duck Typing 鸭子类型</h3>
+<blockquote>
+<p>If it walks like a duck and quacks like a duck, then it’s a duck.</p>
+</blockquote>
+<p>言外之意是，没有理由去考虑那究竟是不是一只鸭子。在 Ruby 中，只要对所有消息的反应符合预期（比如会叫、会走），消息接受者（调用方法的对象）的类（比如 <code>Duck</code> 类）就不重要。面向对象更关心的是，能够“做什么”，而不在于“是什么”。</p>
+<p>鸭子类型利于代码的重用，使得客户端可以使用“假”鸭子而仍然使用你的代码。但它的缺陷在于，我们只知道某个方法的实现，尤其是要传递什么消息给什么对象。比如，如果假定 <code>i</code> 是一个数，在没有被重写的情况下，我们知道 <code>i + i</code> 可以替换成 <code>i * 2</code> 或者 <code>2 * i</code>，但是如果只假定 <code>i</code> 有一个名叫 <code>+</code> 的方法，它可以接受自身作为参数，那我们就无法做出上述替换，因为我们不知道 <code>i</code> 有没有 这个方法，也不知道 <code>2</code> 有没有 这个方法，是不是能接受 <code>i</code> 作为参数。</p>
+<h3>Override and Dynamic Dispatch 重写与动态分配</h3>
+<h3>Mixin 混入</h3>
+<h2>Static VS Dynamic 静态动态对比</h2>
+<p>一门语言称之为静态或是动态，指的是它在什么时候进行类型检查。</p>
+<h3>ML VS Racket</h3>
+<p>可以有两种看法：</p>
+<ol>
+<li>ML 某种程度上是 Racket 的子集，Racket 支持的写法更多，因为一部分 Racket 中允许的表达式不会被 ML 的静态检查通过。比如 if 语句的两个分支返回不同的类型。</li>
+<li>Racket 里的变量其实不是“没有类型”，而是只有“一个类型”。</li>
+</ol>
+<pre><code class="language-sml">datatype theType = (* 所有的变量类型都一样，所以没有必要标注或是检查 *)
+  Int of int | (* 变量所持有的值是有不同类型的，即运行时值是带有所谓标签的 *)
+  String of string |
+  Pair of theType * theType |
+  Fun of theType -&gt; theType |
+  ...
+</code></pre>
+<h3>Static Checking 静态检查</h3>
+<p>静态检查处在语法分析之后，程序运行之前，所以称之为“编译时检查”（但这跟语言用编译器还是解释器没有关系）。静态检查如何作用是语言定义的一部分，有的语言做得多有的语言做得少，给定检查规则，也可以自己实现工具来做期望的检查。</p>
+<p>实现静态检查的方式主要是类型系统，但类型系统只是实现静态检查的方式，而不是静态检查的目的。静态检查的目的是防止错误，但这个错误的范围很有限，比如大多数静态检查都不会检查数组是否越界，静态检查也没法告诉你某个地方你应该用乘法但是你用了加法。它能防止的是，字符串不能与整型相除，某个类型不能做某些事情。</p>
+<p>相比于动态检查（即给值加上标签，运行时进行检查），静态检查其实拒绝了一部分并不会出错的程序。这里值得讨论的东西在于，首先，你如何定义错误。</p>
+<p>考虑一个简单的“错误”： <code>3 / 0</code>，你可以在下面这些时间点阻止这个“错误”</p>
+<ul>
+<li>Keystroke-time： 在编辑这段代码的时候阻止，意味着你写下 <code>3 / 0</code> 就已经是一个错误</li>
+<li>Compile-time： 当静态检查器“看到”这段代码的时候阻止，意味着这段代码不应该出现</li>
+<li>Link-time： 当发现这段代码会被调用的时候阻止，意味着调用这段代码是一个错误</li>
+<li>Run-time： 当执行这段代码的时候阻止，即被 <code>0</code> 除这个运算是一种错误</li>
+<li>Even-later</li>
+<li>执行这段代码没有错，但如果用到了这个运算返回的结果（可以是一个表示未定义的标识，比如 <code>undefined</code>），才是一种错误（比如把 <code>undefined</code> 用作数组下标）</li>
+<li>甚至用返回的结果来做计算也没错，<code>3 / 0</code> 应该表示正无穷，同样的 <code>tan(π/2)</code> 也表示正无穷，你可以让它参与计算（事实上， Racket 里 <code>(/ 3.0 0.0)</code> 就返回 <code>+inf.0</code>）</li>
+</ul>
+<p>第二个值得讨论的就是如何定义正确，怎么判断类型检查是符合语言定义的。</p>
+<h3>Soundness And Completeness 可靠与完备</h3>
+<p>设 <code>X</code> 为我们希望类型检查阻止的一件事，定义一个类型系统是</p>
+<ul>
+<li>可靠的（sound）：不接受存在某个输入，使得 <code>X</code> 会发生的程序</li>
+<li>完备的（complete）：不拒绝对任意输入都不会使得 <code>X</code> 发生的程序</li>
+</ul>
+<p>现代语言的类型系统都是可靠的，但不是完备的。可靠意味着使用这门语言的人，可以依赖于 <code>X</code> 不会发生这个事实来编程。完备当然很好，但是实际上被类型系统误诊的情况很少，并且也很容易修改以通过类型检查。</p>
+<p>但是为什么现代语言都不是完备的？实际上，静态检查不能够同时满足下面三件事：</p>
+<ul>
+<li>程序会终止 (Always terminate)</li>
+<li>可靠 (Soundness)</li>
+<li>完备 (Completeness)</li>
+</ul>
+<p>如果一定要抛弃一个，抛弃完备性是一个较好的选择。</p>
+<blockquote>
+<p>（为什么不能同时满足？是因为不可判定性，我解释不了）</p>
+</blockquote>
+<h3>Weak Typing 弱类型</h3>
+<p>假设对于某个 <code>X</code> 而言，类型系统是不可靠的，那么至少要在运行时阻止这个行为。但另一种选择是，不阻止这样的行为，这是程序员的错误，语言不是必须去做检查的。这种情况下，程序可能发生各种不可预料的行为，存在这种情况的语言称为弱类型的。典型的弱类型语言就是 C 和 C++，一个典型的 <code>X</code> 行为就是数组越界。强类型语言比如 Java 会在运行时抛出异常，但弱类型语言不会阻止这个行为，从而发生无法预料的事。</p>
+<p>为什么 C/C++ 会如此设计？</p>
+<ul>
+<li>接近底层，效率优先。检查错误需要额外的时间和空间，程序员也不希望有隐藏的时间空间开销</li>
+<li>“strong types for weak minds”， 即认为人比计算机聪明，我这么写肯定是对的，不用你来告诉我错了，事实证明这种想法是错误的，计算机比人要可靠得多</li>
+</ul>
+<h3>Flexible 灵活性</h3>
+<p>除了检查错误的时间点不同，不同的语言对相同的行为也有不同的对待，也就是有严格和灵活之分。一些语言认为是错误的，可能另一些语言不这么认为，相反赋予了一些看上去是错误的行为正确的意义。（It’s not a bug, but a feature!）</p>
+<ul>
+<li>数组越界：一些语言没有下标越界一说，用了越界的下标会使那个数组变大。还有些语言有从尾部开始的负下标。</li>
+<li>函数传参：一些语言无所谓参数的个数，传的多了会忽略，传的少了会用默认值代入</li>
+<li>隐式转换：一些语言字符串可以和数相加</li>
+</ul>
+<p>（上述举例我真的没有在黑 JavaScript）</p>
+<p>这些特性一方面可能是不明智的，容易隐藏潜在的错误，让程序难以正确调试，但另一方面不可否认的，这种灵活有时候会很有用。这跟语言是动态还是静态也没什么关系，可能容易认为这种灵活让语言更加“动态”，但这只是改变了语义，不再阻止某些行为而已。</p>
+<h3>Static or Dynamic 静态还是动态</h3>
+<p>回到正题，究竟该选择静态语言还是动态语言，各有什么优点和缺点？（永远没有答案可以说，静态一定比动态好，或是反过来）</p>
+<ul>
+<li>方便？动态没有类型的约束表达自然更加自由，但是静态有了确定类型的前提也可以少写很多类似判断类型的代码</li>
+<li>静态语言是否阻止了一些有用的程序？事实上，这些因为类型系统被阻止的程序，因为动态语言因为给值加上标签所以可以在运行时检查，但静态语言依然可以用类似 ML 的 datatype 或是面向对象语言中的多态来显式模拟这种标签。</li>
+<li>“过早”地检查错误？软件工程中有一个真理，bug 发现越早越容易修复。静态检查能帮你发现一些低级错误，使得程序员能专注于业务逻辑。但是动态语言的支持者同样可以说，仍然有一些错误是静态检查无法检测，需要通过测试来发现的，既然最终都要测试，那有没有静态检查也不重要。</li>
+<li>性能好坏？动态语言有标签的开销，但可以做优化，而且静态语言也有需要标签的时候。</li>
+<li>代码复用？显然动态语言更容易复用代码，但也因此更容易出错。</li>
+<li>产品原型设计？动态语言不用设计类型，同时可以先设计一部分，而静态语言必须通过类型检查，但也一样可以通过通配符之类的 case 来表达剩余的未设计部分。</li>
+<li>维护代码？动态语言方便给函数添加新的参数来扩展，并且可以不让用户感知到这一变化。对于静态语言，只要改动了一个地方，类型检查工具会告诉你所有相关联的应该修改的地方，也很方便。</li>
+</ul>
+<h2>OOP VS Functional 面向对象与函数式对比</h2>
+<h3>Multiple Inheritance, Mixin, Interface 多重继承，混入与接口</h3>
+<p>TO BE DONE…</p>
+                    </div>
+                </article>
+            </div>
+        </main>
+        <script src="https://unpkg.com/prismjs@1.29.0/components/prism-core.min.js"></script>
+        <script src="https://unpkg.com/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<footer>
+    <div class="copyright">
+        <p>© 2014 - 2024 Ziqi Shao</p>
+    </div>
+</footer>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</div>
+</body>
+</html>
