@@ -1,0 +1,80 @@
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        <title>Ziqi's blog</title>
+        <link rel="stylesheet" href="/style.css">
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <h1 class="title">Ziqi Shao</h1>
+                <ul class="nav nav-list">
+                    <li class="nav-list-item"><a href="/zh_CN/about">关于我</a></li>
+                    <li class="nav-list-item"><a href="/zh_CN/blogs">博客</a></li>
+                    <li class="nav-list-item"><a href="/en_US/blogs">English</a></li>
+                </ul>
+            </header>
+        <main>
+            <div class="post">
+                <article class="post-block">
+                    <h1 class="post-title">分治法</h1>
+                    <div class="post-info">
+                        <p>2015-02-13</p>
+                    </div>
+                    <div class="post-content">
+                        <h4 id="_1">理论</h4>
+<h4 id="_2">流程</h4>
+<ol>
+<li>分割成很多个同类型的子问题(<strong>Divide</strong>)</li>
+<li>递归地解决这些子问题(<strong>Conquer</strong>)</li>
+<li>合并子问题的答案(<strong>Combine</strong>)</li>
+</ol>
+<h1 id="the-master-method">主序定理(The Master Method)</h1>
+<p>对于递推式：
+$$T(n)=aT(n/b)+O(n^d)$$
+有如下结论：</p>
+<p>$$T(n)=\begin{cases}
+&amp;O(n^d)&amp;\text{if}&amp;d\gt\log_ba\\
+&amp;O(n^d\log n)&amp;\text{if}&amp;d=\log_ba\\
+&amp;O(n^{\log_ba})&amp;\text{if}&amp;d\lt\log_ba
+\end{cases}$$</p>
+<h1 id="_3">经典算法</h1>
+<ol>
+<li>整数乘法(Karatsuba Multiplication)</li>
+<li>归并排序(Mergesort)</li>
+<li>逆序数(Counting Inversions)</li>
+<li>最近点对(Closest Pair)</li>
+<li>矩阵乘法(Strassen’s Subcubic Matrix Multiplication)</li>
+<li>快速排序(Quicksort)</li>
+<li>选择问题(Selection)</li>
+</ol>
+                    </div>
+                </article>
+            </div>
+        </main>
+        <script src="https://unpkg.com/prismjs@1.29.0/components/prism-core.min.js"></script>
+        <script src="https://unpkg.com/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+        <script>
+            MathJax = {
+              tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+              },
+              svg: {
+                fontCache: 'global'
+              }
+            };
+          </script>
+        <script type="text/javascript" id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+<footer>
+    <div class="copyright">
+        <p>© 2014 - 2024 Ziqi Shao</p>
+    </div>
+</footer>
+</div>
+</body>
+</html>

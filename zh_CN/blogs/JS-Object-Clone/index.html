@@ -1,0 +1,160 @@
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        <title>Ziqi's blog</title>
+        <link rel="stylesheet" href="/style.css">
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <h1 class="title">Ziqi Shao</h1>
+                <ul class="nav nav-list">
+                    <li class="nav-list-item"><a href="/zh_CN/about">关于我</a></li>
+                    <li class="nav-list-item"><a href="/zh_CN/blogs">博客</a></li>
+                    <li class="nav-list-item"><a href="/en_US/blogs">English</a></li>
+                </ul>
+            </header>
+        <main>
+            <div class="post">
+                <article class="post-block">
+                    <h1 class="post-title">Jade如何用同一模板渲染出不同文章的页面</h1>
+                    <div class="post-info">
+                        <p>2016-04-02</p>
+                    </div>
+                    <div class="post-content">
+                        <h2 id="what">What:</h2>
+<p>在写我的<a href="https://github.com/novakoki/blog-generator">blog-generator</a>的时候，遇到了传说中面试经常考的对象复制的问题。
+在用Jade模板的时候，要用同一个模板渲染出不同的文章，就需要有不同的locals。
+一开始的想法是，用Jade里面的include markdown，这样只要文件名做变量就可以了，然而事实上Jade并不支持动态include。
+于是只能改用先用marked解析markdown文件为字符串然后填充进去，假设有如下内容</p>
+<p>post.jade</p>
+<pre><code class="language-js">article !{article} //- 这里是解析markdown后得到的字符串，会带有很多转义符号，所以用 !{}的变量表达
+</code></pre>
+<p>locals.json</p>
+<pre><code class="language-json">{
+    &quot;articles&quot;: {
+        &quot;title&quot;: &quot;path&quot;,
+        &quot;title1&quot;: &quot;path1&quot;
+    },
+    &quot;article&quot;: &quot;balabala...&quot;
+}
+</code></pre>
+<p>那么在JavaScript中就可以</p>
+<pre><code class="language-javascript">gulp.task('template', ()=&gt;{
+    var locals = require('./locals.json');
+    for (var title in locals.articles) {    /*    这里做markdown解析并改变locals中article的值    */
+        gulp.src('./post.jade')
+            .pipe(jade({
+                locals: locals
+            }))
+            .pipe(rename(`${title}.html`)) //gulp.dest只能指定输出的目录而不能指定文件名，需要rename = require('gulp-rename')
+            .pipe(gulp.dest('./posts'));
+        }
+    }
+)
+</code></pre>
+<p>然后一切都是由异步引起的问题了，为了符合gulp的风格，我用stream来读取markdown文件的内容</p>
+<pre><code class="language-javascript">var stream = fs.createReadStream(locals.articles[title]);
+var data = '';stream.on('data', (chunk) =&gt; {  data += chunk;});
+stream.on('end', () =&gt; {  locals.article = marked(data);});
+</code></pre>
+<p>因为显然这个过程是异步的，所以我用一个闭包来存每次迭代的title</p>
+<pre><code class="language-js">gulp.task('template', ()=&gt;{  var locals = require('./locals.json'); //这里我一度以为locals也会是在闭包环境里的
+for (var title in locals.articles) {
+    ((title, locals) =&gt; {
+        return () =&gt; {
+            var stream = fs.createReadStream(locals.articles[title]);
+            var data = '';
+            stream.on('data', (chunk) =&gt; {
+                data += chunk;
+            });
+            stream.on('end', () =&gt; {
+                locals.article = marked(data); //这里是会影响外部的locals的
+                gulp.src('./post.jade')
+                    .pipe(jade({
+                        locals: locals
+                        }))
+                    .pipe(rename(`${title}.html`))
+                    .pipe(gulp.dest('./posts'));
+                }
+            );
+        }
+    })(title, locals);
+}
+</code></pre>
+<p>事实上这样最终只会产生相同的页面，即最后迭代的那一次。
+意识到了其中的问题所在之后，我继续做了些修改</p>
+<pre><code class="language-js">gulp.task('template', ()=&gt;{
+    for (var title in locals.articles) {
+        ((title) =&gt; {
+             return () =&gt; {
+                var stream = fs.createReadStream(locals.articles[title]);
+                var data = '';
+                var locals = require('./locals.json'); //喂，这样总可以每个闭包环境都有一份locals了吧
+                stream.on('data', (chunk) =&gt; {
+                    data += chunk;        });
+                    stream.on('end', () =&gt; {
+                        locals.article = marked(data);
+                        gulp.src('./post.jade')
+                        .pipe(jade({
+                            locals: locals
+                            }))
+                            .pipe(rename(`${title}.html`))
+                            .pipe(gulp.dest('./posts'));
+                        });
+                    }
+        })(title);
+    }
+});
+</code></pre>
+<p>结果是被第二次打脸了，于是我只好寻求复制多份原始的locals，再分别做设置。
+这里我没有用比较常规的写一个递归函数或者用原型来做复制，而是选择直接操作JSON字符串。</p>
+<pre><code class="language-js">stream.on('end', () =&gt; {
+    gulp.src('./post.jade')
+        .pipe(jade({
+            locals: JSON.parse(`${JSON.stringify(locals).slice(0,-1)},${marked(data)}}`)
+        }))
+        .pipe(rename(`${title}.html`))
+        .pipe(gulp.dest('./posts'));
+    }
+);
+</code></pre>
+<p>这样就用同一个模板给每篇文章都生成了一个页面，相应的，主页中需要展示一个文章摘要列表也可以做类似的实现。</p>
+<h2 id="why">Why:</h2>
+<p>回到上面的过程中，为什么我说一切问题都是由异步引起的？更确切些，可以说是由异步和引用类型引起的。</p>
+<p>首先，无论是node自身的stream还是gulp的stream，在读取或是写入时都是异步执行的，用于迭代的变量最终被用到时循环早已结束，这样的情形在DOM批量绑定事件的时候也早已见怪不怪了。</p>
+<p>一个简单的闭包可以解决问题，这么做了之后第一次修改我意识到了问题在于传参的类型，字符串、数字都在闭包中保存了一份拷贝，而引用类型或者说对象并没有，或者说在闭包中只是存了一份该指向对象指针的拷贝而已。</p>
+<p>改完之后为什么还是不对呢？确实每个闭包都有了一个locals才对啊。问题在于gulp的stream也是异步的，即gulp用到locals的时候，匿名函数调用已经结束了，locals作为局部变量已经被销毁了。</p>
+<h2 id="how">How:</h2>
+<p>《JavaScript高级程序设计》 P69-71</p>
+<p><a href="http://jerryzou.com/posts/dive-into-deep-clone-in-javascript/">深入剖析 JavaScript 的深复制</a></p>
+                    </div>
+                </article>
+            </div>
+        </main>
+        <script src="https://unpkg.com/prismjs@1.29.0/components/prism-core.min.js"></script>
+        <script src="https://unpkg.com/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+        <script>
+            MathJax = {
+              tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+              },
+              svg: {
+                fontCache: 'global'
+              }
+            };
+          </script>
+        <script type="text/javascript" id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+<footer>
+    <div class="copyright">
+        <p>© 2014 - 2024 Ziqi Shao</p>
+    </div>
+</footer>
+</div>
+</body>
+</html>

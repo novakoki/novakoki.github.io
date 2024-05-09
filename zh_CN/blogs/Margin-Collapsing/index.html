@@ -1,0 +1,82 @@
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        <title>Ziqi's blog</title>
+        <link rel="stylesheet" href="/style.css">
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <h1 class="title">Ziqi Shao</h1>
+                <ul class="nav nav-list">
+                    <li class="nav-list-item"><a href="/zh_CN/about">关于我</a></li>
+                    <li class="nav-list-item"><a href="/zh_CN/blogs">博客</a></li>
+                    <li class="nav-list-item"><a href="/en_US/blogs">English</a></li>
+                </ul>
+            </header>
+        <main>
+            <div class="post">
+                <article class="post-block">
+                    <h1 class="post-title">CSS中外边距层叠的问题</h1>
+                    <div class="post-info">
+                        <p>2016-03-31</p>
+                    </div>
+                    <div class="post-content">
+                        <h2 id="what">what:</h2>
+<p>Q:</p>
+<pre><code class="language-html">&lt;div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;/p&gt;
+</code></pre>
+<pre><code class="language-css">div {
+  position: fixed;
+  height: 35px;
+}
+
+p {
+  margin-top: 15px;
+}
+
+</code></pre>
+<p>问div距离窗口上边的距离是多少？</p>
+<p>A: 15px</p>
+<h2 id="why">why:</h2>
+<ol>
+<li>在没有指定left，top等的情况下，它们的默认值为auto，意味着div的位置应该放在其静态位置，
+即在其正常文档流中的位置。</li>
+<li>那么问题转变为，div的静态位置应该在哪？这里涉及到一个外边距层叠的问题，p元素和body有15px的margin，
+在没有清除样式的情况下，浏览器默认body与html之间有不定大小的margin，这两个垂直距离上的margin会发生层叠，
+即最终body与html之间有了15px的margin，所以div就和窗口上边有了15px的margin</li>
+</ol>
+<h2 id="how">how:</h2>
+<p>BFC: <a href="http://www.w3cplus.com/css/understanding-bfc-and-margin-collapse.html">深入理解BFC和Margin Collapse</a></p>
+<p><a href="https://www.zhihu.com/question/19823139">如何解决外边距叠加的问题？</a></p>
+                    </div>
+                </article>
+            </div>
+        </main>
+        <script src="https://unpkg.com/prismjs@1.29.0/components/prism-core.min.js"></script>
+        <script src="https://unpkg.com/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+        <script>
+            MathJax = {
+              tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+              },
+              svg: {
+                fontCache: 'global'
+              }
+            };
+          </script>
+        <script type="text/javascript" id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+<footer>
+    <div class="copyright">
+        <p>© 2014 - 2024 Ziqi Shao</p>
+    </div>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        <title>Ziqi's blog</title>
+        <link rel="stylesheet" href="/style.css">
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <h1 class="title">Ziqi Shao</h1>
+                <ul class="nav nav-list">
+                    <li class="nav-list-item"><a href="/zh_CN/about">关于我</a></li>
+                    <li class="nav-list-item"><a href="/zh_CN/blogs">博客</a></li>
+                    <li class="nav-list-item"><a href="/en_US/blogs">English</a></li>
+                </ul>
+            </header>
+        <main>
+            <div class="post">
+                <article class="post-block">
+                    <h1 class="post-title">Machine Learning : Linear Regression</h1>
+                    <div class="post-info">
+                        <p>2015-02-07</p>
+                    </div>
+                    <div class="post-content">
+                        <p>线性回归即用线性函数对因变量和一个或多个自变量之间的关系进行建模。这个函数是多个称为回归系数的参数的线性组合。</p>
+<p>给定数据集（n个变量，m组数据）</p>
+<p>用矩阵来表示数据集</p>
+<p>$$
+X=
+\begin{pmatrix}
+1&amp;x_{11}&amp;x_{21}&amp;\cdots&amp;x_{n1}\\
+\vdots&amp;\vdots&amp;\vdots&amp;\ddots&amp;\vdots\\
+1&amp;x_{1m}&amp;x_{2m}&amp;\cdots&amp;x_{nm}
+\end{pmatrix}
+$$</p>
+<p>$$
+Y=
+\begin{pmatrix}
+y_1\\
+\vdots\\
+y_m
+\end{pmatrix}
+$$
+用最小二乘法，即要寻找一个函数
+$$h_\theta(x)=x\theta$$
+其中$\theta$ 为参数，$\theta=\begin{pmatrix}
+\theta_0\\
+\theta_1\\
+\vdots\\
+\theta_m
+\end{pmatrix}$ ,
+$h_{\theta}(X)$ 叫做Hypothesis</p>
+<p>使得 $$J(\theta)=\frac1{2m}\sum_{i=1}^{m}{(h_{\theta}(x^{(i)})-y_i)^2}$$ 最小，此处 $$x^{(i)}=\begin{pmatrix}x_{i1}&amp;x_{i2}&amp;\cdots&amp;x_{in}\end{pmatrix}$$，$J(\theta)$叫做Cost Function</p>
+<hr />
+<h3 id="normal-equation">非迭代法(Normal Equation)</h3>
+<p>$$\theta=(X^T X)^{-1}X^TY$$</p>
+<ul>
+<li>可以不用考虑数据的scale，即每个变量取值范围之间的差距</li>
+<li>大量矩阵运算，尤其是求逆运算复杂度较高，不适于大量数据，$O(n^3)$</li>
+<li>$X^TX$可能出现奇异的情况，原因：<ol>
+<li>自变量太多而数据不够，即 $m\lt n$，可以考虑删除一些</li>
+<li>自变量冗余，即有两个或以上变量线性相关</li>
+</ol>
+</li>
+</ul>
+<h3 id="gradient-descent">迭代法(梯度下降，Gradient Descent)</h3>
+<p>$$Repeat:{\
+\theta_j:=\theta_j-\alpha\frac1m\sum_{i=1}^m{(h_{\theta}(x^{(i)})-y_i)^2}x_j^{(i)}\
+}$$</p>
+<ul>
+<li>需要判断算法是否已经正确执行，即如何确定稳定。可以观察$J(\theta)$图像，也可以给定一个值，当迭代后的减少量小于该值就认为迭代结束</li>
+<li>要考虑数据的scale，否则出现梯度下降困难。可以把每个自变量的取值范围都统一到一定的区间内，如：
+$$x_i:=\frac{x_i-\mu_i}{S_i}$$
+使得$-1\lt x_i\lt1$，其中$\mu_i$为均值，$S_i$为取值范围</li>
+<li>要考虑速率 $\alpha$，太大容易出现迭代后增加而非减少，太小则运行时间延长。可以尝试从小的值逐渐增大并观察$J(\theta)$图像变化</li>
+</ul>
+                    </div>
+                </article>
+            </div>
+        </main>
+        <script src="https://unpkg.com/prismjs@1.29.0/components/prism-core.min.js"></script>
+        <script src="https://unpkg.com/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+        <script>
+            MathJax = {
+              tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+              },
+              svg: {
+                fontCache: 'global'
+              }
+            };
+          </script>
+        <script type="text/javascript" id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+<footer>
+    <div class="copyright">
+        <p>© 2014 - 2024 Ziqi Shao</p>
+    </div>
+</footer>
+</div>
+</body>
+</html>

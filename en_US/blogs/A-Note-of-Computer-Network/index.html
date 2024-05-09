@@ -1,0 +1,313 @@
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        <title>Ziqi's blog</title>
+        <link rel="stylesheet" href="/style.css">
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <h1 class="title">Ziqi Shao</h1>
+                <ul class="nav nav-list">
+                    <li class="nav-list-item"><a href="/en_US/about">About</a></li>
+                    <li class="nav-list-item"><a href="/en_US/blogs">Blog</a></li>
+                    <li class="nav-list-item"><a href="/zh_CN/blogs">中文</a></li>
+                </ul>
+            </header>
+        <main>
+            <div class="post">
+                <article class="post-block">
+                    <h1 class="post-title">A Note of Computer Network</h1>
+                    <div class="post-info">
+                        <p>2015-08-20</p>
+                    </div>
+                    <div class="post-content">
+                        <div class="toc">
+<ul>
+<li><a href="#i-introduction">I. Introduction</a><ul>
+<li><a href="#1-computer-network-and-distributed-system">1. Computer Network and Distributed System</a></li>
+<li><a href="#2-uses">2. Uses</a></li>
+<li><a href="#3-hardware">3. Hardware</a></li>
+<li><a href="#4-software">4. Software</a></li>
+<li><a href="#5-reference-model">5. Reference Model</a></li>
+<li><a href="#6-network-standardization">6. Network Standardization</a></li>
+</ul>
+</li>
+<li><a href="#ii-the-physical-layer">II. The Physical Layer</a><ul>
+<li><a href="#1-the-theoretical-basis-for-data-communication">1. The Theoretical Basis for Data Communication</a></li>
+<li><a href="#2-digital-modulation">2. Digital Modulation</a></li>
+<li><a href="#3-multiplexing">3. Multiplexing</a></li>
+<li><a href="#4-switching">4. Switching</a></li>
+</ul>
+</li>
+<li><a href="#iii-the-data-link-layer">III. The Data Link Layer</a><ul>
+<li><a href="#1-framing">1. Framing</a></li>
+</ul>
+</li>
+<li><a href="#iv-the-medium-access-control-sublayer">IV. The Medium Access Control Sublayer</a></li>
+<li><a href="#v-the-network-layer">V. The Network Layer</a></li>
+<li><a href="#vi-the-transport-layer">VI. The Transport Layer</a></li>
+<li><a href="#vii-the-application-layer">VII. The Application Layer</a></li>
+<li><a href="#viii-network-security">VIII. Network Security</a></li>
+</ul>
+</div>
+<h2 id="i-introduction">I. Introduction</h2>
+<h3 id="1-computer-network-and-distributed-system">1. Computer Network and Distributed System</h3>
+<p>Example: World Wide Web, Hadoop</p>
+<hr />
+<h3 id="2-uses">2. Uses</h3>
+<ul>
+<li><strong>Business Application</strong><ul>
+<li>Resource Sharing <em>(Client-Server Model)</em></li>
+<li>Communication Medium</li>
+<li>Electric Commerce</li>
+</ul>
+</li>
+<li><strong>Home Application</strong><ul>
+<li>Connectivity <em>(Peer-to-Peer)</em></li>
+<li>Person-to-Person communication<ul>
+<li>Instant Messaging (Twitter)</li>
+<li>Social Network (Facebook)</li>
+<li>Wiki (Wikipedia)</li>
+</ul>
+</li>
+<li>Electric Commerce (B2C, B2B, G2C, C2C, P2P)</li>
+<li>Entertainment</li>
+<li>Ubiquitous Computing (RFID, IOT)</li>
+</ul>
+</li>
+<li><strong>Mobile Users</strong><ul>
+<li>Wireless Network</li>
+<li>Text Messaging (SMS)</li>
+<li>Mobile Commerce</li>
+<li>Sensor Network</li>
+<li>Wearable Computers</li>
+</ul>
+</li>
+<li>
+<p><strong>Social Issues</strong></p>
+<ul>
+<li>Network Neutrality</li>
+<li>DMCA</li>
+<li>Privacy</li>
+<li>Spam</li>
+<li>Secruity</li>
+<li>Law (Electric Gambling)</li>
+</ul>
+<hr />
+</li>
+</ul>
+<h3 id="3-hardware">3. Hardware</h3>
+<ul>
+<li>Sorted by <strong>Type</strong><ul>
+<li>Broadcast</li>
+<li>Point-to-Point</li>
+</ul>
+</li>
+<li>Sorted by <strong>Scale</strong><ul>
+<li>Internetworks</li>
+<li>Wide Area Network</li>
+<li>Metropolitan Area Network</li>
+<li>Local Area Network</li>
+<li>Personal Area Network</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="4-software">4. Software</h3>
+<ul>
+<li>
+<p><strong>Layer, Protocol, Interface, Service</strong>
+Most networks are organized as a stack of <strong>layers</strong>.
+A <strong>protocol</strong> is an agreement between the communicating parties on how communication is to proceed.
+The <strong>interface</strong> defines which primitive operations and services the lower layer makes available to the upper one.
+A <strong>service</strong> is a set of primitives(operations) that a layer provides to the layer above it.</p>
+</li>
+<li>
+<p><strong>Design Issues</strong></p>
+</li>
+<li>
+<p>Reliability</p>
+<ul>
+<li>Error Detection</li>
+<li>Error Correction</li>
+<li><strong>Routing</strong></li>
+</ul>
+</li>
+<li>Evolution<ul>
+<li>Addressing or Naming</li>
+<li><strong>Internetworking</strong></li>
+</ul>
+</li>
+<li>Resource Allocation<ul>
+<li><strong>Multiplexing</strong></li>
+<li><strong>Flow Control</strong></li>
+<li><strong>Congestion</strong></li>
+<li>Quality of Service</li>
+</ul>
+</li>
+<li>
+<p>Secure</p>
+</li>
+<li>
+<p><strong>Connection Oriented</strong> VS <strong>Connectionless</strong>
+<strong>Realiable communication may not be availble in a given layer;
+The delays inherent in providing a reliable service may be unacceptable.</strong></p>
+<ol>
+<li>Connection Oriented<ul>
+<li><strong>Byte Stream</strong> VS <strong>Message Stream</strong></li>
+<li>Voice over IP</li>
+</ul>
+</li>
+<li>Connectionless<ul>
+<li>Datagram</li>
+<li>Request-Reply</li>
+</ul>
+</li>
+<li>Service Primitive</li>
+</ol>
+</li>
+</ul>
+<hr />
+<h3 id="5-reference-model">5. Reference Model</h3>
+<table>
+<thead>
+<tr>
+<th>OSI</th>
+<th>TCP/IP</th>
+<th>Used in the book</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Application</td>
+<td>Application</td>
+<td>Application</td>
+</tr>
+<tr>
+<td>Presentation</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Session</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Transport</td>
+<td>Transport</td>
+<td>Transport</td>
+</tr>
+<tr>
+<td>Network</td>
+<td>Network</td>
+<td>Network</td>
+</tr>
+<tr>
+<td>Data Link</td>
+<td>Link</td>
+<td>Data Link</td>
+</tr>
+<tr>
+<td>Physical</td>
+<td>-</td>
+<td>Physical</td>
+</tr>
+</tbody>
+</table>
+<h3 id="6-network-standardization">6. Network Standardization</h3>
+<hr />
+<h2 id="ii-the-physical-layer">II. The Physical Layer</h2>
+<blockquote>
+<p>It defines the electrical, timing and other interfaces by which
+ <strong>bits</strong> are sent as <strong>signals</strong> over <strong>channels</strong>.</p>
+</blockquote>
+<h3 id="1-the-theoretical-basis-for-data-communication">1. The Theoretical Basis for Data Communication</h3>
+<ul>
+<li>Fourier Analysis</li>
+<li>Bandwidth-Limited Signals<ul>
+<li><strong>Bandwidth</strong>
+ The width of the frequency range transmitted without being strongly attenuated is called the bandwidth.</li>
+<li><strong>Baseband</strong>
+ Signals that run from 0 up to the maximum frequency are called baseband signals.</li>
+<li><strong>Passband</strong>
+ Signals that are shifted to occupy a higher range of frequencies, as is the case of all wireless transmissions, are called passband signals.</li>
+</ul>
+</li>
+<li>
+<p>The Maximum Data Rate of a Channel</p>
+<ul>
+<li>Nyquist’s theorem
+$$maximum\ data\ rate=2B\log\_2V\ bits/sec$$</li>
+<li>Shannon’s theorem
+$$maximum\ data\ rate=B\log\_2(1+S/N)\ bits/sec$$</li>
+</ul>
+<p>$$10\log\_{10}S/N=1\ dB$$</p>
+</li>
+</ul>
+<h3 id="2-digital-modulation">2. Digital Modulation</h3>
+<ul>
+<li>Baseband<ul>
+<li>NRZ</li>
+<li>NRZI</li>
+<li>Manchester</li>
+<li>Bipolar</li>
+<li>4B/5B</li>
+</ul>
+</li>
+<li>Passband<ul>
+<li>ASK</li>
+<li>FSK</li>
+<li>PSK</li>
+<li>Constellation Diagram</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-multiplexing">3. Multiplexing</h3>
+<ul>
+<li>FDM</li>
+<li>TDM</li>
+<li>CDMA</li>
+</ul>
+<h3 id="4-switching">4. Switching</h3>
+<h2 id="iii-the-data-link-layer">III. The Data Link Layer</h2>
+<h3 id="1-framing">1. Framing</h3>
+<h2 id="iv-the-medium-access-control-sublayer">IV. The Medium Access Control Sublayer</h2>
+<h2 id="v-the-network-layer">V. The Network Layer</h2>
+<h2 id="vi-the-transport-layer">VI. The Transport Layer</h2>
+<h2 id="vii-the-application-layer">VII. The Application Layer</h2>
+<h2 id="viii-network-security">VIII. Network Security</h2>
+                    </div>
+                </article>
+            </div>
+        </main>
+        <script src="https://unpkg.com/prismjs@1.29.0/components/prism-core.min.js"></script>
+        <script src="https://unpkg.com/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+        <script>
+            MathJax = {
+              tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+              },
+              svg: {
+                fontCache: 'global'
+              }
+            };
+        </script>
+        <script type="text/javascript" id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+<footer>
+    <div class="copyright">
+        <p>© 2014 - 2024 Ziqi Shao, unless otherwise noted.</p>
+    </div>
+</footer>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</div>
+</body>
+</html>
