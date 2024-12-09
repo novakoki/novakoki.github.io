@@ -1,0 +1,127 @@
+baseURL: "https://ziqi.moe/"
+title: Ziqi's Homepage
+paginate: 10
+theme: PaperMod
+
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+
+minify:
+  disableXML: true
+  minifyOutput: true
+
+markup:
+  goldmark:
+    extensions:
+      passthrough:
+        delimiters:
+          block:
+          - - \[
+            - \]
+          - - $$
+            - $$
+          inline:
+          - - $
+            - $
+          - - \(
+            - \)
+        enable: true
+
+params:
+  math: true
+  env: production # to enable google analytics, opengraph, twitter-cards and schema.
+  title: Ziqi Shao
+  DateFormat: "January 2, 2006"
+  defaultTheme: light # dark, light
+  disableThemeToggle: false
+  displayFullLangName: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowReadingTime: true
+  UseHugoToc: true
+  disableSpecial1stPost: false
+  disableScrollToTop: false
+  comments: true
+  hidemeta: false
+  hideSummary: false
+  showtoc: true
+  tocopen: true
+
+  label:
+    text: "Ziqi Shao"
+    icon: /apple-touch-icon.png
+    iconHeight: 35
+
+  # home-info mode
+  homeInfoParams:
+    Title: "\U0001F44B Welcome to Ziqi's Blog"
+    Content: >
+      Hi, I'm Ziqi Shao. You can call me Sam.
+
+      - currently a master student in Computer Science at Northeastern University in Vancouver.
+      
+      - Previously I had six years of work experience in ByteDance and two AI startups, focusing on building and optimizing machine learning systems.
+
+  profileMode:
+    enabled: false
+
+  socialIcons:
+    - name: linkedin
+      url: "https://linkedin.com/in/shaoziqi"
+    - name: github
+      url: "https://github.com/novakoki"
+    - name: email
+      url: "mailto:shaoziqi0628@gmail.com"
+
+  cover:
+    hidden: true # hide everywhere but not in structured data
+    hiddenInList: true # hide on list pages and home
+    hiddenInSingle: true # hide on single page
+
+  # for search
+  # https://fusejs.io/api/options.html
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: true
+    location: 0
+    distance: 1000
+    threshold: 0.4
+    minMatchCharLength: 0
+    limit: 10 # refer: https://www.fusejs.io/api/methods.html#search
+    keys: ["title", "permalink", "summary", "content"]
+
+DefaultContentLanguage: "en"
+defaultContentLanguageInSubdir: false
+
+languages:
+  en:
+    languageName: "English"
+    languageCode: en-US
+    menu:
+      main:
+        - name: Posts
+          url: "/"
+          weight: 1
+        - name: Archive
+          url: "/archives"
+        - name: Search
+          url: "/search"
+        - identifier: tags
+          name: Tags
+          url: /tags/
+        - name: Series
+          url: "/series"
+          weight: 2
+
+  cn:
+    languageName: "中文"
+    languageCode: zh-CN
+    disabled: false
+    contentDir: cn/
+    params:
+      homeInfoParams:
+        Title: "\U0001F44B 欢迎来到子奇的博客"
+        Content: ""
